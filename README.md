@@ -1,4 +1,4 @@
-# многопроцессность и многопоточность vs асинхронный ввод-вывод
+# многопроцессность и многопоточность vs асинхронный ввод-вывод (*Python*)
 
 **Параллельность (*Parallelism*)** - выполнение множества операций в одно и то же время.
 
@@ -19,6 +19,26 @@
 - учитывая сказанное выше, асинхронный код позволяет выполнять задачи одновременно. Если быть точным, то он имитирует ощущение одновременности.
 
 Асинхронность удобна в случаях, когда есть большие «периоды ожидания», которые бы блокировали исполнение программы в случае стандартного исполнения кода.
+
+| Concurrency Type | Switching Decision | Number of Processors |
+|---|---|:---:|
+| Pre-emptive multitasking (`threading`) | The operating system decides when to switch tasks external to Python. | 1 |
+| Cooperative multitasking (`asyncio`) | The tasks decide when to give up control. | 1 |
+| Multiprocessing (`multiprocessing`) | The processes all run at the same time on different processors. | Many |
+
+**Используйте потоки для одновременного ввода-вывода и процессы для параллельных вычислений.**
+
+## When to Use Concurrency
+
+The first step of this process is deciding if you *should* use a concurrency module. Concurrency always comes with extra complexity and can often result in bugs that are difficult to find.
+
+Hold out on adding concurrency until you have a known performance issue and *then* determine which type of concurrency you need.
+
+Once you’ve decided that you should optimize your program, figuring out if your program is CPU-bound or I/O-bound is a great next step. Remember that I/O-bound programs are those that spend most of their time waiting for something to happen while CPU-bound programs spend their time processing data or crunching numbers as fast as they can.
+
+As you saw, CPU-bound problems only really gain from using `multiprocessing`. `threading` and `asyncio` did not help this type of problem at all.
+
+For I/O-bound problems, there’s a general rule of thumb in the Python community: ***“Use `asyncio` when you can, `threading` when you must.”*** `asyncio` can provide the best speed up for this type of program, but sometimes you will require critical libraries that have not been ported to take advantage of `asyncio`. Remember that any task that doesn’t give up control to the event loop will block all of the other tasks.
 
 ---
 [Async IO in Python: A Complete Walkthrough](https://realpython.com/async-io-python/)  
